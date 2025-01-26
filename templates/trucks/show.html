@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Header -->
+  <div id="detail-header" class="full-width"></div>
+  <div class="row full-width">
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <ul class="user-stats nav nav-pills text-light justify-content-between">
+            <img src="{{ truck.logo_image }}" alt="Image for {{ truck.name }}" id="profile-avatar">
+            <li class="stat stat-start">
+              <h6>Rating</h6>
+              <h4>{{ average_rating }} / 5</h4>
+            </li>
+            <li class="stat">
+              <h1 class="truck-name">{{ truck.name }}</h1>
+            </li>
+            <li class="stat  ">
+              <div>              
+                <button class="btn btn-lg btn-outline-light">
+                  <a href="https://www.google.com/maps/place/{{ truck.latitude }},{{ truck.longitude }}">Directions</a>
+                </button>
+              </div>
+              <br>
+              <div>
+                <button class="btn btn-lg btn-outline-light">
+                  <a href="/trucks/{{ truck.id }}/review">Leave a Review</a>
+                </button>
+              </div>
+            </li>
+            <li class="stat stat-end">
+              {% if g.user %}
+              {% if user.id == g.user.id %}
+                <h6>Add To Favorites</h6>
+                <form method="POST" action="/trucks/{{ truck.id }}/favorite" class="favorite">
+                  <button class="
+                              btn 
+                              btn-sm 
+                              {% if truck in user.favorites %}
+                                  btn-warning
+                              {% else %}
+                                  btn-secondary
+                              {% endif %}"
+                  >
+                    <i class="fa fa-star"></i>
+                  </button>
+                </form>
+              {% endif %}
+            {% endif %}
+              {% if truck.social_media_1 or truck.social_media_2 %}
+                <h6>Follow us on:</h5>
+                <div>
+                  <a href="{{ truck.social_media_1 }}"><i class="fab fa-facebook-square fa-lg"></i></a>
+                  <a href="{{ truck.social_media_2 }}"><i class="fab fa-instagram fa-lg"></i></a>
+                </div>
+              {% endif %}  
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<br>
+
+<!-- Truck Content -->
+<div class="row full-width">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col">
+        <div class="col">
+          <blockquote>
+            <p>{{ truck.bio }}</p>
+          </blockquote>
+        </div>
+        <hr>
+        <h4><strong>Hours:</strong>
+          {% if truck.open_time and truck.close_time %}
+            {{ truck.open_time.strftime('%I:%M %p') }} - {{ truck.close_time.strftime('%I:%M %p') }}
+          {% else %}
+            CLOSED
+          {% endif %}
+          </h4>
+        <h4><strong>Location:</strong> {{ truck.location or "CLOSED" }}</h4>
+        <h4><strong>Phone:</strong> {{ truck.phone_number }}</h4>
+      </div>
+      <div class="col">
+        <ul>
+          <li>
+            <img class="menu" src="{{ truck.menu_image }}" alt="">
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- Reviews  -->
+<div class="row full-width">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <h2><strong>Reviews:</strong></h2>
+          <ul class="list-group" id="reviews">
+            {% for review in truck.reviews %}
+
+              <li class="list-group-item text-center">
+                <a href="/trucks/{{ review.truck_id }}">
+                    <img src="{{ review.trucks.logo_image }}" alt="" class="card-image">
+                </a>
+                <div class="truck-name-label">
+                    <a href="/trucks/{{ review.truck_id }}"><strong>{{ review.trucks.name }}</strong></a>
+                </div>
+                {% if user.id == g.user.id %}
+                    <form method="POST" action="/trucks/{{ review.truck_id }}/favorite" class="messages-like">
+                        <button class="
+                                    btn 
+                                    btn-sm 
+                                    {% if review.trucks in user.favorites %}
+                                        btn-warning
+                                    {% else %}
+                                        btn-secondary
+                                    {% endif %}"
+                        >
+                            <i class="fa fa-star"></i> 
+                        </button>                         
+                    </form>
+                    <div class="review">
+                        <ul class="review=images">
+                          <li class="review-images">
+                            {% if review.image_1 %}
+                              <img src="{{ review.image_1 }}">
+                            {% endif %}
+                            {% if review.image_2 %}
+                              <img src="{{ review.image_2 }}">
+                            {% endif %}
+                            {% if review.image_3 %}
+                              <img src="{{ review.image_3 }}">
+                            {% endif %}
+                            {% if review.image_4 %}
+                              <img src="{{ review.image_4 }}">
+                            {% endif %}
+                          </li>
+                            <li>Rating: {{ review.rating }} / 5</li>
+                            <li class="review-text">{{ review.review }}</li>
+                            <li><small>Author: {{ review.users.full_name }}</small></li>
+                        </ul>
+                    </div>
+                {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+      </div>
+      <h3>
+        <button class="btn btn-primary review-btn">
+          <a class="text-light" href="/trucks/{{ truck.id }}/reviews">See More</a>
+      </button>
+    </h3>
+    </div>
+  </div>
+</div>
+{% endblock %}

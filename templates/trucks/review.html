@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  <div class="row justify-content-md-center">
+    <div class="col-md-7 col-lg-5">
+      <form method="POST" class="forms" id="user_form">
+        <h2 class="join-message text-center">{{ truck.name }} Review</h2>
+        {{ form.hidden_tag() }}
+
+        {% for field in form if field.widget.input_type != 'hidden' %}
+          {% for error in field.errors %}
+            <span class="text-danger">{{ error }}</span>
+          {% endfor %}
+          {% if field.id == 'rating' %}
+            {{ field.label }}
+            {{ field(placeholder=field.label.text, class="form-control") }}
+            <p class="range-container text-center">
+              <output class="range-value"></output> / 5
+            </p>
+          {% else %}
+            {{ field.label }}
+            {{ field(placeholder=field.label.text, class="form-control") }}
+          {% endif %}
+        {% endfor %}
+        <div class="form-btn-area">
+          <button class="btn btn-success btn-lg btn-block">Submit</button>
+          <a href="/trucks/{{ truck.id }}" class="btn btn-lg btn-secondary btn-block">Cancel</a>  
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+
+{% endblock %}

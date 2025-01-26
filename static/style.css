@@ -1,0 +1,262 @@
+/* NAVBAR */
+
+.navbar-header .navbar-brand img {
+    height: 5rem;
+}
+
+.nav-item {
+    padding: 0.5rem;
+}
+
+.nav-item a img {
+    height: 2rem;
+}
+
+.nav a {
+    text-decoration: none;
+    
+}
+
+
+body {
+    background-color: rgb(187, 175, 175);
+}
+
+ul {
+    list-style: none;
+}
+
+.welcome-image img {
+    width: 20rem;
+}
+
+.message-404 p a {
+    text-decoration: none;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+.message-404 button {
+    margin-left: 7rem;
+    margin-top: 1rem;
+}
+
+.message-404 input {
+    width: 20rem;
+}
+
+.image-404 img {
+    width: 15rem;
+}
+
+/* Show User  */
+#profile-avatar {
+    max-height: 11rem;
+    max-width: 15rem;
+}
+
+#detail-header {
+    height: 7rem;
+    background-image: url("/static/images/detail-header-background-image.jpg");
+    background-size: contain;
+}
+
+.delete-btn .btn {
+    font-size: 1.4rem;
+}
+
+.stat {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-end {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.stat-start h6 {
+    padding-bottom: 0.5rem;
+}
+.user-stats {
+    background-color: black;
+}
+
+#user-profile-buttons{
+    width: 65%;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#user-profile-buttons .btn{
+    height: 4rem;
+}
+
+#profile-avatar-parent {
+    padding: 0;
+    margin: 0;
+}
+
+/* INDEX */
+.card-image {
+    height: 10rem;
+}
+
+/* Reviews */
+.review-images img {
+    height: 10rem;
+}
+
+.review-btn a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 1rem;
+}
+
+.range-container {
+    margin-bottom: 0;
+}
+
+.review-text {
+    font-size: 0.9rem;
+}
+
+.review-images {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.review-images img {
+    height: 7rem;
+}
+
+.edit-btn-area a {
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Truck Details */
+.menu {
+    height: 20rem;
+}
+
+#reviews .list-group-item {
+    background-color: rgb(177, 196, 173);
+    margin: 0.8rem;
+    border: 0.3rem white solid;
+    border-radius: 5%;
+}
+
+.truck-name {
+    font-size: 3rem;
+}
+
+.truck-name-label a {
+    text-decoration: none;
+    color: inherit;
+    font-size: 1.5rem;
+}
+
+.my-truck a {
+    color: rgb(54, 21, 199);
+    font-weight: 500;
+    font-size: 1.2rem;
+    text-decoration: none;
+}
+
+.favorite {
+    padding-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+/* User */
+
+.list-group {
+    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+#index li {
+    margin: 0.5rem;
+}
+
+.list-group-item {
+    max-width: 30rem;
+    border: 0.2rem, white, solid;
+    border-radius: 5%;
+}
+
+.list-group-item * {
+    padding: 0.2rem;
+}
+
+/* Forms */
+.form-header {
+    font-size: 2.5rem;
+}
+
+.forms {
+    background: rgb(34,193,195);
+    background: linear-gradient(17deg, rgba(34,193,195,1) 0%, rgba(253,187,45,1) 100%);
+    padding: 2rem;
+    border-radius: 5%;
+}
+
+.forms * {
+    padding: 0.2rem;
+}
+
+.forms label {
+    font-weight: 500;
+}
+
+.form-btn-area {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-btn-area .btn, a {
+    font-size: 1.3rem;
+    margin-top: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* Homepage */
+.map {
+    height: 30rem;
+    width: 48rem;
+}
+
+.home-list {
+    width: 40rem;
+    padding-top: 1rem;
+    border: 0.2rem black solid;
+    background-color: rgb(190, 190, 190);
+}
+
+#home-avatar {
+    width: 12rem;
+    padding-right: 2rem;
+
+}
+
+.home-list p {
+    margin-bottom: 0.5rem;
+}
+.home-list a {
+    text-decoration: none;
+    color: black;
+    font-size: 1rem;
+    padding: 0;
+    margin-top: 0;
+}
+
+#truck-name-home a {
+    font-size: 1.5rem;
+}

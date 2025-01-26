@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Food Truck Locator</title>
+
+  <link rel="stylesheet"
+        href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
+  <script src="https://unpkg.com/jquery"></script>
+  <script src="https://unpkg.com/popper"></script>
+  <script src="https://unpkg.com/bootstrap"></script>
+
+  <link rel="stylesheet"
+        href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="shortcut icon" href="/static/favicon.ico">
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+<nav class="navbar navbar-expand bg-light">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a href="/" class="navbar-brand">
+        <img src="/static/images/website-logo.jpg" alt="logo">
+        <span>Food Truck Locator</span>
+      </a>
+    </div>
+    <ul class="nav navbar-nav navbar-right">
+      {% if request.endpoint != None %}
+      <li class="nav-item">
+        <form class="navbar-form d-flex" action="/trucks">
+          <button class="btn btn-default">
+            <span class="fa fa-binoculars fa-lg"></span>
+          </button>
+          <input name="q" class="form-control" placeholder="Search" id="search">
+        </form>
+      </li>
+      {% endif %}
+      {% if not g.user %}
+      <li class="nav-item"><a href="/signup">Sign up</a></li>
+      <li class="nav-item"><a href="/login">Log in</a></li>
+      {% else %}
+      <li class="nav-item">
+        <a href="/users/{{ g.user.id }}">
+          <img src="{{ g.user.profile_image }}" alt="{{ g.user.username }}">
+        </a>
+      </li>
+      <li class="nav-item"><a href="/logout">Log out</a></li>
+      {% endif %}
+    </ul>
+  </div>
+</nav>
+<div class="container">
+  {% for category, message in get_flashed_messages(with_categories=True) %}
+  <div class="alert alert-{{ category }}">{{ message }}</div>
+  {% endfor %}
+
+  {% block content %}
+  {% endblock %}
+
+</div>
+</body>
+</html>
+

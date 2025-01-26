@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div id="detail-header" class="full-width"></div>
+<div class="row full-width">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <ul class="user-stats nav nav-pills text-light">
+          <a href="/users/{{ user.id }}" id="profile-avatar-parent">
+            <img src="{{ user.profile_image }}" alt="Image for {{ user.username }}" id="profile-avatar">
+          </a>
+          <li class="stat">
+            <p class="small">Reviews</p>
+            <h4>
+              <a href="/users/{{ user.id }}/reviews">{{ user.reviews | length }}</a>
+            </h4>
+          </li>
+          <li class="stat">
+            <p class="small">Favorites</p>
+            <h4>
+              <a href="/users/{{ user.id }}/favorites">{{ user.favorites | length }}</a>
+            </h4>
+          </li>
+          <div class="nav " id="user-profile-buttons">
+            {% if g.user.id == user.id %}
+            <button class="btn btn-outline-light">
+              <a href="/users/profile">Edit Profile</a>
+            </button>
+            {% if user.role == "business" %}
+            <button class="btn btn-outline-light">
+                <a href="/trucks/profile">Edit Business Profile</a>
+            </button>
+            <!-- <button class="btn btn-outline-light">
+                <a href="/trucks/schedule">Edit Schedule</a>
+            </button> -->
+            <button class="btn btn-outline-light">
+                <a href="/trucks/{{ user.trucks[0].id }}/location">Update Location</a>
+            </button>
+            {% endif %}
+            <button class="btn btn-outline-light">
+              <a href="/users/change_password">Change Password</a>
+            </button>
+            <form method="POST" action="/users/delete" class="delete-btn">
+              <button class="btn btn-outline-danger">Delete Account</button>
+            </form>
+            {% endif %}
+          </div>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-3">
+    <h4 id="sidebar-user_name">{{ user.full_name }}</h4>
+    {% if user.role == "business" %}
+      <p class="my-truck">My Truck:<a href="/trucks/{{ user.trucks[0].id }}">{{ user.trucks[0].name }}</a></p>
+    {% endif %}
+  </div>
+
+  {% block user_details %}
+  {% endblock %}
+
+</div>
+
+{% endblock %}

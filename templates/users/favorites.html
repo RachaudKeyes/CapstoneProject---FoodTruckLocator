@@ -1,0 +1,36 @@
+{% extends 'users/detail.html' %}
+{% block user_details %}
+    <div class="col-sm-9">
+        <div class="row">
+            <h1 class="text-center">Favorites:</h1>
+            <ul class="list-group" id="index">
+                {% for truck in favorites %}
+
+                    <li class="list-group-item text-center">
+                    <a href="/trucks/{{ truck.id }}">
+                        <img src="{{ truck.logo_image}}" alt="" class="card-image">
+                    </a>
+                    <div class="truck-name-label">
+                        <a href="/trucks/{{ truck.id }}"><strong>{{ truck.name }}</strong></a>
+                    </div>
+                    {% if user.id == g.user.id %}
+                        <form method="POST" action="/trucks/{{ truck.id }}/favorite" class="messages-like">
+                            <button class="
+                                        btn 
+                                        btn-sm 
+                                        {% if truck in user.favorites %}
+                                            btn-warning
+                                        {% else %}
+                                            btn-secondary
+                                        {% endif %}"
+                            >
+                                <i class="fa fa-star"></i> 
+                            </button>                         
+                        </form>
+                    {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

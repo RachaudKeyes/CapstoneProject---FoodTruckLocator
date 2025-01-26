@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block body_class %}error-404{%endblock %}
+
+{% block content %}
+
+  <div class="message-404">
+    <h4 class="display-4 text-center">Sorry, that page doesn't exist! {{ request.status }}</h4>
+    <p class="m-3 text-center">
+      You can search Food Truck Locator using the search box below or return to the <a href="/"><b>homepage.</b></a>
+    </p>
+    <div class="image-404 text-center">
+      <img src="https://i.gifer.com/G2TW.gif" alt="">
+    </div>
+    <br>
+    <div class="row">
+      <div class="d-flex justify-content-center">
+        <form class="form-inline" action="/trucks">
+          <input name="q" class="form-control mb-0 mr-2 text-center" placeholder="Search Food Trucks">
+          <button class="btn btn-primary">Search</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

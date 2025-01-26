@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h1 class="text-center">Quad Cities</h1>
+    <div class="text-center">
+        <iframe class="map" src="{{ url }}" frameborder="0"></iframe>
+    </div>
+    <div class="container d-flex justify-content-center">
+        <div class="home-list">
+            <ul class="">
+                {% for truck in trucks %}
+                    <li class="d-flex justify-content">
+                        <a href="/trucks/{{ truck.id }}">
+                            <img id="home-avatar" src="{{ truck.logo_image }}" alt="">
+                        </a>
+                        <div class="">
+                            <h5 id="truck-name-home">
+                                <a href="/trucks/{{ truck.id }}"><strong>{{ truck.name }}</strong></a>
+                            </h5>
+                            <p>Rating: {{ average_rating[ loop.index - 1 ] }} / 5</p>
+                            <p class=""><a href="https://www.google.com/maps/place/{{ truck.latitude }},{{ truck.longitude }}">{{ truck.location}}</a></p>
+                            {% if truck.open_time and truck.close_time %}
+                                <p>{{ truck.open_time.strftime('%I:%M %p') }} - {{ truck.close_time.strftime('%I:%M %p') }}</p>
+                            {% endif %}
+                            <p>Call us: {{ truck.phone_number }}</p>
+                        </div>
+                    </li>
+                    <hr>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

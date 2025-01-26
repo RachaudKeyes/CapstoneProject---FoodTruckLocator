@@ -1,0 +1,63 @@
+{% extends 'users/detail.html' %}
+{% block user_details %}
+    <div class="col-sm-9">
+        <div class="row">
+            <h1 class="text-center">Reviews:</h1>
+            <ul class="list-group" id="reviews">
+                {% for review in reviews %}
+
+                    <li class="list-group-item text-center">
+                    <a href="/trucks/{{ review.truck_id }}" class="message-link"/>
+                        <img src="{{ review.trucks.logo_image }}" alt="" class="card-image">
+                    </a>
+                    <div class="truck-name-label">
+                        <a href="/trucks/{{ review.truck_id }}"><strong>{{ review.trucks.name }}</strong></a>
+                    </div>
+                    {% if user.id == g.user.id %}
+                        <form method="POST" action="/trucks/{{ review.truck_id }}/favorite" class="messages-like">
+                            <button class="
+                                        btn 
+                                        btn-sm 
+                                        {% if review.trucks in user.favorites %}
+                                            btn-warning
+                                        {% else %}
+                                            btn-secondary
+                                        {% endif %}"
+                            >
+                                <i class="fa fa-star"></i> 
+                            </button>                         
+                        </form>
+                        <div class="review">
+                            <ul>
+                                <li class="review-images">
+                                    {% if review.image_1 %}
+                                        <img src="{{ review.image_1 }}">
+                                    {% endif %}
+                                    {% if review.image_2 %}
+                                        <img src="{{ review.image_2 }}">
+                                    {% endif %}
+                                    {% if review.image_3 %}
+                                        <img src="{{ review.image_3 }}">
+                                    {% endif %}
+                                    {% if review.image_4 %}
+                                        <img src="{{ review.image_4 }}">
+                                    {% endif %}
+                                </li>
+                                <li>Rating: {{ review.rating }} / 5</li>
+                                <li class="review-text">{{ review.review }}</li>
+                                <li><small>Author: {{ user.full_name }}</small></li>
+                                <div class="edit-btn-area">
+                                    <a href="/users/reviews/{{ review.id }}/edit" class="btn btn-success">Edit</a>
+                                    {% if review.user_id == g.user.id %}
+                                        <a href="/users/reviews/{{ review.id }}/delete" class="btn btn-danger">Delete</a>
+                                    {% endif %}
+                                </div>
+                            </ul>
+                        </div>
+                    {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
