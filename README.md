@@ -5,16 +5,26 @@ A full-page web application that allows users to see Quad City food trucks, view
 
 ## Setup
 
+### Local
 Create Python virtual environment
 
 Install requirements.txt
 
-Set up the database:
+Set up the database:  
+
     ```
-    (venv) $ createdb food_truck
+    (venv) $ createdb food_truck  
+    ```  
+
+    ```
     (venv) $ psql -d food_truck -f seed.sql
     ```
 Start server
+
+### Render
+Click the link for Render live server app:  
+
+[Food Truck Locator](https://foodtrucklocator.onrender.com)
 
 ## App Features:
 
