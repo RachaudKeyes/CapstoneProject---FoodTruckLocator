@@ -11,8 +11,8 @@ from secrets2 import API_SECRET_KEY
 
 CURR_USER_KEY = "curr_user"
 KEY = API_SECRET_KEY
-GEOCODE_API_BASE_URL = "http://www.mapquestapi.com/geocoding/v1"
-MAP_API_BASE_URL = "http://www.mapquestapi.com/staticmap/v5/map"
+GEOCODE_API_BASE_URL = "https://www.mapquestapi.com/geocoding/v1"
+MAP_API_BASE_URL = "https://www.mapquestapi.com/staticmap/v5/map"
 
 app = Flask(__name__)
 
