@@ -9,6 +9,9 @@ from models import db, connect_db, User, Truck, Review
 
 from secrets2 import API_SECRET_KEY
 
+# for render
+from etc.secrets.secrets2 import API_SECRET_KEY
+
 CURR_USER_KEY = "curr_user"
 KEY = API_SECRET_KEY
 GEOCODE_API_BASE_URL = "http://www.mapquestapi.com/geocoding/v1"
