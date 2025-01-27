@@ -7,11 +7,7 @@ from sqlalchemy import text
 from forms import UserAddForm, LoginForm, TruckAddForm, UserEditForm, ChangePasswordForm, TruckEditForm, UserReviewForm, UserReviewEditForm, TruckLocationForm
 from models import db, connect_db, User, Truck, Review
 
-# for local
 from secrets2 import API_SECRET_KEY
-
-# for Render
-API_SECRET_KEY = os.environ.get('API_SECRET_KEY', "EMPTY")
 
 CURR_USER_KEY = "curr_user"
 KEY = API_SECRET_KEY
