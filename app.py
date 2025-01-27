@@ -7,16 +7,16 @@ from sqlalchemy import text
 from forms import UserAddForm, LoginForm, TruckAddForm, UserEditForm, ChangePasswordForm, TruckEditForm, UserReviewForm, UserReviewEditForm, TruckLocationForm
 from models import db, connect_db, User, Truck, Review
 
+# for local
 from secrets2 import API_SECRET_KEY
 
-# for render
-from etc.secrets.secrets2 import API_SECRET_KEY
+# for Render
+API_SECRET_KEY = os.environ.get('API_SECRET_KEY', "EMPTY")
 
 CURR_USER_KEY = "curr_user"
 KEY = API_SECRET_KEY
 GEOCODE_API_BASE_URL = "http://www.mapquestapi.com/geocoding/v1"
 MAP_API_BASE_URL = "http://www.mapquestapi.com/staticmap/v5/map"
-
 
 app = Flask(__name__)
 
