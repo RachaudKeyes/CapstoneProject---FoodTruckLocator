@@ -15,19 +15,6 @@
                         <a href="/trucks/{{ review.truck_id }}"><strong>{{ review.trucks.name }}</strong></a>
                     </div>
                     {% if user.id == g.user.id %}
-                        <form method="POST" action="/trucks/{{ review.truck_id }}/favorite" class="messages-like">
-                            <button class="
-                                        btn 
-                                        btn-sm 
-                                        {% if review.trucks in user.favorites %}
-                                            btn-warning
-                                        {% else %}
-                                            btn-secondary
-                                        {% endif %}"
-                            >
-                                <i class="fa fa-star"></i> 
-                            </button>                         
-                        </form>
                         <div class="review">
                             <ul>
                                 <li class="review-images">
