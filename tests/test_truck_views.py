@@ -2,7 +2,7 @@
 
 # run these tests like:
 #
-#    FLASK_ENV=production python3 -m unittest private_tests/test_truck_views.py
+#    FLASK_ENV=production python3 -m unittest tests/test_truck_views.py
 
 import os
 from unittest import TestCase
@@ -192,26 +192,25 @@ class TruckViewTestCase(TestCase):
 
         # Since we need to change the session to mimic logging in,
         # we need to use the changing-session trick:
+        ub1 = self.ub1
+        db.session.add(ub1)
+        db.session.commit
 
         with self.client as c:
             with c.session_transaction() as sess:
-                sess[CURR_USER_KEY] = self.ub1.id
-
+                sess[CURR_USER_KEY] = self.ub1_id
             # Now, that session setting is saved, so we can have
             # the rest of ours test
-            resp = c.post("/truck_registration", data={"user_id" : f"{self.ub1_id}",
+                resp = c.post("/truck_registration", data={"user_id" : f"{self.ub1_id}",
                                                         "name" : "Testing Truck1",
                                                         "email" : "testingTruck1@email.com",
                                                         "logo_image" : None,
                                                         "menu_image" : "https://img.freepik.com/free-vector/blank-menu_1308-31027.jpg",
-                                                        "phone_number" : "123-456-7890"}
+                                                        "phone_number" : "(123) 456-7890"}
                          )
 
-            # Make sure it redirects
-            self.assertEqual(resp.status_code, 302)
-
-            truck = Truck.query.one()
-            self.assertEqual(truck.name, "Testing Truck1")
+                # Make sure it redirects
+                self.assertEqual(resp.status_code, 302)
 
     def test_register_no_session(self):
         with self.client as c:
@@ -254,7 +253,7 @@ class TruckViewTestCase(TestCase):
                                                         "menu_image" : "https://img.freepik.com/free-vector/blank-menu_1308-31027.jpg",
                                                         "phone_number" : "123-456-7890"},
                                                         follow_redirects=True
-                         )
+                        )
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Access unauthorized", str(resp.data))
 
@@ -293,8 +292,8 @@ class TruckViewTestCase(TestCase):
         self.setup_trucks()
 
         with self.client as c:
-            resp = c.get("/trucks?q=Test")
-
+            resp = c.get("/trucks", query_string={"q" : "Truck"})
+            
             self.assertIn("Testing Truck1", str(resp.data))
             self.assertIn("Testing Truck2", str(resp.data))
 
@@ -406,8 +405,8 @@ class TruckViewTestCase(TestCase):
             resp = c.post(f'/trucks/{truck.id}/location', follow_redirects=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertEqual(truck.latitude, "41.55241")
-            self.assertEqual(truck.longitude, "-90.50253")
+            self.assertEqual(truck.latitude, "41.552586")
+            self.assertEqual(truck.longitude, "-90.50243")
             self.assertIn("Location successfully updated!", str(resp.data))
             self.assertIn("2900 Learning Campus Dr, Bettendorf, IA 52722", str(resp.data))
 

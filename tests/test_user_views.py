@@ -31,6 +31,7 @@ db.create_all()
 # Don't have WTForms use CSRF at all, since it's a pain to test
 
 app.config['WTF_CSRF_ENABLED'] = False
+app.testing = True
 
 class UserViewTestCase(TestCase):
     """Test views for users."""
@@ -492,40 +493,40 @@ class UserViewTestCase(TestCase):
         self.setup_reviews()
 
         u = self.testuser
+        u1 = self.u1
 
-        db.session.add(u)
+        db.session.add(u, u1)
         db.session.commit()
 
         r = Review.query.filter(Review.rating == 1.0).one()
-
         with self.client as c:
 
-            resp = c.post(f"/users/reviews/{r.id}/edit", data={"user_id" : f"{self.testuser.id}",
+            resp = c.post(f"/users/reviews/{r.id}/edit", data={"user_id" : f"{r.user_id}",
                                                                "truck_id" : f"{r.truck_id}",
                                                                "rating" : "1.0",
                                                                "review" : "This is an OK test review!"
                                                                },
                                                                follow_redirects=True)
-            
             self.assertEqual(resp.status_code, 200)
             self.assertNotIn("This is an OK test review", str(resp.data))
-            self.assertIn("Access unauthorized.", str(resp.data))
+            self.assertIn("Access unauthorized", str(resp.data))
 
     def test_edit_review_not_creator(self):
         self.setup_reviews()
 
-        u = self.u1
+        u = self.testuser
+        u1 = self.u1
 
-        db.session.add(u)
+        db.session.add(u, u1)
         db.session.commit()
 
         r = Review.query.filter(Review.rating == 1.0).one()
 
         with self.client as c:
             with c.session_transaction() as sess:
-                sess[CURR_USER_KEY] = self.u1.id
+                sess[CURR_USER_KEY] = u1.id
 
-            resp = c.post(f"/users/reviews/{r.id}/edit", data={"user_id" : f"{self.u1.id}",
+            resp = c.post(f"/users/reviews/{r.id}/edit", data={"user_id" : f"{r.id}",
                                                                "truck_id" : f"{r.truck_id}",
                                                                "rating" : "1.0",
                                                                "review" : "This is an OK test review!"
