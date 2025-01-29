@@ -62,12 +62,12 @@ class Truck(db.Model):
                         db.ForeignKey('users.id', ondelete='cascade'),
                         nullable=False)
     
-    name = db.Column(db.Text,
+    name = db.Column(db.String(25),
                          nullable=False,
                          unique=True
                          )
     
-    email = db.Column(db.Text,
+    email = db.Column(db.String(40),
                       nullable=False,
                       unique=True
                       )
@@ -80,7 +80,7 @@ class Truck(db.Model):
     menu_image = db.Column(db.Text,
                            nullable=False)
     
-    phone_number = db.Column(db.Text,
+    phone_number = db.Column(db.String(20),
                             nullable=False)
     
     # schedule_id = db.Column(db.Integer,
@@ -112,15 +112,15 @@ class Truck(db.Model):
 
     @classmethod
     def request_coords(cls, API_BASE, key, location):
-        """Return {lat, lng} from MapQuest API for given location"""
+        """Return {lat, lng} from MapBox API for given location"""
 
-        url = f"{API_BASE}/address?key={key}&location={location}"
+        url = f"{API_BASE}.places/{location}.json?access_token={key}"
 
         response = requests.get(url)
         r = response.json()
 
-        lat = r['results'][0]['locations'][0]['latLng']['lat']
-        lng = r['results'][0]['locations'][0]['latLng']['lng']
+        lng = r['features'][0]['geometry']['coordinates'][0]
+        lat = r['features'][0]['geometry']['coordinates'][1]
 
         return {"lat": lat, "lng": lng}
 
@@ -135,20 +135,20 @@ class User(db.Model):
                    autoincrement=True
                    )
 
-    username = db.Column(db.Text,
+    username = db.Column(db.String(20),
                          nullable=False,
                          unique=True
                          )
     
-    email = db.Column(db.Text,
+    email = db.Column(db.String(40),
                       nullable=False,
                       unique=True
                       )
     
-    first_name = db.Column(db.Text,
+    first_name = db.Column(db.String(20),
                            nullable=False)
     
-    last_name = db.Column(db.Text,
+    last_name = db.Column(db.String(20),
                            nullable=False)
     
     password = db.Column(db.Text,

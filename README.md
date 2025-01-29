@@ -36,13 +36,18 @@ All app features are intended to create an easy-to-use app for food truck lovers
     *   Click burger icon to return to homepage.
     *   Search for food trucks in the search bar and binoculars icon.
     *   Click on the profile image to access the logged-in user's profile.
-*   View a static map of the Quad City area with purple pings that indicate food truck locations.  
-*   View a list of registered food trucks just below the static map.  
+*   View an interactive map of the Quad City area with red icons that indicate food truck locations.  
+    *   Click on an icon to see a pop-up of the associated food truck's logo, name, and location.
+    *   Click the logo to go the food truck's page.  
+    *   Click the address for directions.
+*   View a list of registered food trucks just below the map.  
     *   Click the logo to go the food truck's page.  
     *   Click the address for directions.
   
 
 ![home page image 1](./static/images/readme/home-screen-1.png "Home Page Image 1") 
+
+![home page image 3](./static/images/readme/home-screen-3.png "Home Page Image 3") 
   
 ![home page image 2](./static/images/readme/home-screen-2.png "Home Page Image 2")  
 
@@ -114,8 +119,8 @@ Note: Each business user is allowed only 1 food truck per account.
     
 ## APIs Used:
 
-* MapQuest Geocoding API
-* MapQuest Static Map API
+* MapBox Geocoding API
+* MapBox Map API
 
 ## Technology Used:
 
@@ -127,9 +132,8 @@ Note: Each business user is allowed only 1 food truck per account.
 
 ## Limitations
 
-*   The static map is not ineractive nor are the icons to show food truck details as you hover.
 *   The app has not been styled for smaller screens yet.
-*   The app is designed for the Quad City area only.
+*   The app is designed for the Quad City area only with capablity to expand due to interactive map
 
 ## Future Goals:
 

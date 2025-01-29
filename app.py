@@ -1,18 +1,20 @@
-import os
+import os, requests
 from flask import Flask, render_template, request, flash, redirect, session, g
 # from flask_debugtoolbar import DebugToolbarExtension
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
+from functools import wraps
 
 from forms import UserAddForm, LoginForm, TruckAddForm, UserEditForm, ChangePasswordForm, TruckEditForm, UserReviewForm, UserReviewEditForm, TruckLocationForm
 from models import db, connect_db, User, Truck, Review
 
-from secrets2 import API_SECRET_KEY
+from secrets2 import API_SECRET_KEY, APP_SECRET_KEY, ACCESS_TOKEN
 
 CURR_USER_KEY = "curr_user"
 KEY = API_SECRET_KEY
-GEOCODE_API_BASE_URL = "https://www.mapquestapi.com/geocoding/v1"
-MAP_API_BASE_URL = "https://www.mapquestapi.com/staticmap/v5/map"
+# GEOCODE_API_BASE_URL = "https://www.mapquestapi.com/geocoding/v1"
+GEOCODE_API_BASE_URL = "https://api.mapbox.com/geocoding/v5/mapbox"
+
 
 app = Flask(__name__)
 
@@ -24,13 +26,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = (
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "it's a secret")
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', APP_SECRET_KEY)
 # toolbar = DebugToolbarExtension(app)
 
 app.app_context().push()
 connect_db(app)
 db.create_all()
-
 
 ##############################################################################
 # User signup/login/logout
@@ -58,6 +59,28 @@ def do_logout():
 
     if CURR_USER_KEY in session:
         del session[CURR_USER_KEY]
+
+def user_auth(f):
+    """ Check if user is logged-in."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user is not None:
+            return f(*args, **kwargs)
+        else:
+            flash("Access unauthorized", "danger")
+            return redirect("/")
+    return decorated_function      
+
+def business_auth(f):
+    """ Check if user's role is business."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user.role != "business":
+            flash("Access unauthorized", "danger")
+            return redirect("/")
+        else:
+            return f(*args, **kwargs)
+    return decorated_function      
 
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -100,13 +123,15 @@ def signup():
         if user.role == "business":
             return redirect("truck_registration")
         
-        return redirect("/")
+        return homepage()
 
     else:
         return render_template('users/signup.html', form=form)
     
     
 @app.route('/truck_registration', methods=["GET", "POST"])
+@user_auth
+@business_auth
 def register_truck():
     """
     Handle business/truck registration.
@@ -116,17 +141,9 @@ def register_truck():
     If there already is a Truck with that Title: flash message
     and re-present form.
     """
+
     user = g.user
 
-    # Check if user is logged-in
-    if not user:
-        flash("Access unauthorized", "danger")
-        return redirect("/")
-    
-    if user.role != "business":
-        flash("Access unauthorized", "danger")
-        return redirect("/")
-    
      # User can only have one business profile
     if len(user.trucks) == 1:
         flash("Access denied. Business profile already exists.", "danger")
@@ -196,11 +213,9 @@ def logout():
 # General user routes:
 
 @app.route('/users/<int:user_id>')
+@user_auth
 def users_show(user_id):
     """Show user profile."""
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     user = User.query.get_or_404(user_id)
 
@@ -208,12 +223,9 @@ def users_show(user_id):
 
 
 @app.route('/users/<int:user_id>/favorites', methods=["GET"])
+@user_auth
 def users_show_favorites(user_id):
     """Show a list of favorited food trucks by current logged-in user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     
     user = User.query.get_or_404(user_id)
 
@@ -221,12 +233,9 @@ def users_show_favorites(user_id):
 
 
 @app.route('/trucks/<int:truck_id>/favorite', methods=["POST"])
+@user_auth
 def toggle_favorite(truck_id):
     """Toggle a favorited food truck for current logged-in user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     
     truck = Truck.query.get_or_404(truck_id)
 
@@ -254,13 +263,10 @@ def toggle_favorite(truck_id):
 
 
 @app.route('/trucks/<int:truck_id>/review', methods=["GET", "POST"])
+@user_auth
 def add_review(truck_id):
     """ Add a review for truck for logged-in user."""
 
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
-    
     truck = Truck.query.get_or_404(truck_id)
 
     # Handle case, logged in user cannot review their own truck
@@ -268,7 +274,7 @@ def add_review(truck_id):
         flash("Cannot review your own truck!", "danger")
         redired_url = request.referrer or "/"
         return redirect(redired_url)
-    
+
     form = UserReviewForm()
 
     if form.validate_on_submit():
@@ -288,17 +294,14 @@ def add_review(truck_id):
         flash("Review successfully submitted!", "success")
 
         return redirect(f"/trucks/{truck_id}")
-    
+
     return render_template('trucks/review.html', form=form, truck=truck, user=g.user)
 
 
 @app.route('/users/<int:user_id>/reviews', methods=["GET"])
+@user_auth
 def users_show_reviews(user_id):
     """Show a list of food trucks reviewed by current logged-in user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     
     user = User.query.get_or_404(user_id)
 
@@ -306,44 +309,40 @@ def users_show_reviews(user_id):
 
 
 @app.route('/users/reviews/<int:review_id>/edit', methods=["GET", "POST"])
+@user_auth
 def edit_review(review_id):
-        """Update review for logged in-user."""
+    """Update review for logged in-user."""
 
-        if not g.user:
-            flash("Access unauthorized.", "danger")
-            return redirect("/")
+    user = g.user
+    reviewObj = Review.query.get_or_404(review_id)
+
+    # Only creator can edit review
+    if user.id != reviewObj.user_id:
+        flash("Access Unauthorized.", "danger")
+        redired_url = request.referrer or "/"
+        return redirect(redired_url)
+
+    form = UserReviewEditForm(obj=reviewObj)
+
+    if form.validate_on_submit():
+        reviewObj.rating = form.rating.data,
+        reviewObj.review = form.review.data,
+        reviewObj.image_1 = form.image_1.data or None,
+        reviewObj.image_2 = form.image_2.data or None,
+        reviewObj.image_3 = form.image_3.data or None,
+        reviewObj.image_4 = form.image_4.data or None
+
+        db.session.commit()
+        flash("Review updated!", "success")
+        return redirect(f"/users/{ g.user.id}/reviews")
     
-        user = g.user
-        reviewObj = Review.query.get_or_404(review_id)
-
-        # Only creator can edit review
-        if user.id != reviewObj.user_id:
-            flash("Access Unauthorized.", "danger")
-
-        form = UserReviewEditForm(obj=reviewObj)
-
-        if form.validate_on_submit():
-            reviewObj.rating = form.rating.data,
-            reviewObj.review = form.review.data,
-            reviewObj.image_1 = form.image_1.data or None,
-            reviewObj.image_2 = form.image_2.data or None,
-            reviewObj.image_3 = form.image_3.data or None,
-            reviewObj.image_4 = form.image_4.data or None
-
-            db.session.commit()
-            flash("Review updated!", "success")
-            return redirect(f"/users/{ g.user.id}/reviews")
-        
-        return render_template("/users/review_edit.html", user=user, review=reviewObj, form=form)
+    return render_template("/users/review_edit.html", user=user, review=reviewObj, form=form)
 
 
 @app.route('/users/reviews/<int:review_id>/delete', methods=["GET"])
+@user_auth
 def delete_review(review_id):
     """Delete a logged-in user's specific review."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     
     review = Review.query.get_or_404(review_id)
 
@@ -361,13 +360,9 @@ def delete_review(review_id):
 
 
 @app.route('/users/profile', methods=["GET", "POST"])
+@user_auth
 def edit_profile():
     """Update profile for current user."""
-
-    # Check if user is logged-in
-    if not g.user:
-        flash("Access unauthorized", "danger")
-        return redirect("/")
 
     user = g.user
     form = UserEditForm(obj=user)
@@ -396,12 +391,9 @@ def edit_profile():
 
 
 @app.route('/users/change_password', methods=["GET", "POST"])
+@user_auth
 def change_password():
     """Show form for logged-in user to change password. Update password if current password is correct."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     
     user = g.user
     form = ChangePasswordForm()
@@ -434,12 +426,9 @@ def change_password():
 
 
 @app.route('/users/delete', methods=["POST"])
+@user_auth
 def delete_user():
     """Delete logged-in user account."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
 
     do_logout()
 
@@ -496,21 +485,14 @@ def truck_show(truck_id):
 
 
 @app.route('/trucks/profile', methods=["GET", "POST"])
+@user_auth
+@business_auth
 def truck_edit():
     """ Update truck profile for current user with role = "business".
         Only truck owner can edit profile.
     """
-
-    # Check if user is logged-in and has role = "business"
-    user = g.user
-
-    if not user:
-        flash("Access unauthorized", "danger")
-        return redirect("/")
     
-    if user.role != "business":
-        flash("Access unauthorized", "danger")
-        return redirect("/")
+    user = g.user
     
     truckObj = user.trucks[0]
 
@@ -547,19 +529,12 @@ def truck_edit():
 
 
 @app.route('/trucks/<int:truck_id>/location', methods=["GET", "POST"])
+@user_auth
+@business_auth
 def truck_location(truck_id):
     """Show and handle a form for logged in truck user to update location and business hours."""
-
-    # Check if user is logged-in and has role = "business"
-    user = g.user
-
-    if not user:
-        flash("Access unauthorized", "danger")
-        return redirect("/")
     
-    if user.role != "business":
-        flash("Access unauthorized", "danger")
-        return redirect("/")
+    user = g.user
     
     truck = Truck.query.get_or_404(truck_id)
 
@@ -576,8 +551,8 @@ def truck_location(truck_id):
         truck.location = form.location.data
         
         if truck.location:
-            truck.latitude = truck.request_coords(GEOCODE_API_BASE_URL, KEY, truck.location)["lat"]
-            truck.longitude = truck.request_coords(GEOCODE_API_BASE_URL, KEY, truck.location)["lng"]
+            truck.latitude = truck.request_coords(GEOCODE_API_BASE_URL, ACCESS_TOKEN, truck.location)["lat"]
+            truck.longitude = truck.request_coords(GEOCODE_API_BASE_URL, ACCESS_TOKEN, truck.location)["lng"]
 
         db.session.commit()
         flash("Location successfully updated!", "success")
@@ -587,12 +562,9 @@ def truck_location(truck_id):
     
 
 @app.route('/trucks/<int:truck_id>/reviews', methods=["GET"])
+@user_auth
 def truck_list_reviews(truck_id):
     """Show a list of all reviews for a specified truck for logged-in user."""
-
-    if not g.user:
-        flash("Access unauthorized.", "danger")
-        return redirect("/")
     
     truck = Truck.query.get_or_404(truck_id)
 
@@ -617,17 +589,26 @@ def homepage():
     - logged in: map populated with registered trucks and list below
     """
 
-    size = "750,650"
-    center = "41.520251,-90.540287"
-    marker = "via-md-b92ce3"
     locations = ""
+    truck_names = []
+    truck_logos = []
+    truck_ids = []
     rounded = []
 
     if g.user:
         # Retrieve truck locations from database. Add to LOCATIONS string.
         trucks = Truck.query.all()
         for truck in trucks:
-            locations += f"{truck.latitude},{truck.longitude}||"
+            # last element, move semicolon
+            if truck == trucks[-1]:
+                locations += f"{truck.longitude},{truck.latitude}"
+            else:
+               locations += f"{truck.longitude},{truck.latitude};"
+
+            # prepare JS lists
+            truck_names.append(truck.name)
+            truck_logos.append(truck.logo_image)
+            truck_ids.append(truck.id)
 
             # average rating query
             t = text(f'SELECT AVG(rating) as average_rating FROM reviews WHERE truck_id = {truck.id}')
@@ -638,9 +619,11 @@ def homepage():
             else:
                 rounded.append("None")
 
-        url = f"{MAP_API_BASE_URL}?key={KEY}&locations={locations}&size={size}&center={center}&defaultMarker={marker}&zoom=12"
+        url = f"{GEOCODE_API_BASE_URL}.places-permanent/{locations}.json?access_token={ACCESS_TOKEN}"
+        response = requests.get(url)
+        r = response.json()
 
-        return render_template('home.html', url=url, trucks=trucks, average_rating=rounded)
+        return render_template('home.html', url=url, trucks=trucks, truck_names=truck_names, truck_logos=truck_logos, truck_ids=truck_ids, average_rating=rounded, ACCESS_TOKEN=ACCESS_TOKEN, resp=r)
 
     else:
         return render_template('home-anon.html')
