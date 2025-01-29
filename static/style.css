@@ -13,10 +13,8 @@
 }
 
 .nav a {
-    text-decoration: none;
-    
+    text-decoration: none; 
 }
-
 
 body {
     background-color: rgb(187, 175, 175);
@@ -228,9 +226,11 @@ ul {
 }
 
 /* Homepage */
-.map {
-    height: 30rem;
-    width: 48rem;
+#map {
+    height: 20rem;
+    width: 40rem;
+    margin: 1.5rem;
+
 }
 
 .home-list {
@@ -260,3 +260,44 @@ ul {
 #truck-name-home a {
     font-size: 1.5rem;
 }
+
+.marker {
+    background-image: url('/static/images/map-pin.png');
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .mapboxgl-popup {
+    max-width: 10rem;
+  }
+  
+  .mapboxgl-popup-content {
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+  }
+
+
+  .popup-img img {
+    width: 5rem;
+    color: none;
+  }
+
+  .popup-img a {
+    outline: none;
+  }
+
+  .popup-address a {
+    text-decoration: none;
+    color: black;
+    font-size: 0.8rem;
+  }    
+
+  .popup-name a {
+    text-decoration: none;
+    color: black;
+    font-size: 1.2rem;
+    font: bold;
+  }
