@@ -1,9 +1,64 @@
 {% extends 'base.html' %}
 {% block content %}
+
     <h1 class="text-center">Quad Cities</h1>
-    <div class="text-center">
-        <iframe class="map" src="{{ url }}" frameborder="0"></iframe>
+
+    <div id="map-container" class="d-flex justify-content-center">
+        <div id='map'></div>
     </div>
+
+<!-- Variables -->
+    <script>
+         //  mark python data as safe for use in js
+        const truckNames = {{ truck_names|safe }}
+        const truckLogos = {{ truck_logos|safe }}
+        const truckIds = {{ truck_ids|safe }}
+        const respData = {{ resp|safe }};
+    </script>
+
+<!-- Map -->
+    <script>
+    mapboxgl.accessToken = "{{ ACCESS_TOKEN }}";
+
+    const map = new mapboxgl.Map({
+        container: 'map', // container ID
+        style: 'mapbox://styles/mapbox/streets-v12', // style URL
+        center: [-90.540287, 41.520251], // starting position [lng, lat]
+        zoom: 10, // starting zoom
+    });
+
+    // Load GeoJSON data
+    for (let i = 0; i < respData.length; i++) {
+
+        // create a HTML element for each marker
+        let el = document.createElement('div');
+        el.className = 'marker';
+
+        // make a marker for frist feature [0] and add to the map
+        new mapboxgl.Marker(el).setLngLat(respData[i].features[0].geometry.coordinates).addTo(map); 
+
+        // adding popups to markers ()
+        new mapboxgl.Marker(el)
+        .setLngLat(respData[i].features[0].geometry.coordinates)
+        .setPopup(
+            new mapboxgl.Popup({ offset: 25 }) // add popups
+            .setHTML(
+                `<div class="popup-img">
+                    <a href="/trucks/${truckIds[i]}"><img src="${truckLogos[i]}" alt=""></a>
+                </div>
+                <h5 class="popup-name">
+                    <a href="/trucks/${truckIds[i]}">${truckNames[i]}</a>
+                </h5>
+                <p class="popup-address">
+                    <a href="https://www.google.com/maps/place/${respData[i].features[0].geometry.coordinates[1]},${respData[i].features[0].geometry.coordinates[0]}">${respData[i].features[0].place_name}
+                </p>`
+            )
+        )
+        .addTo(map);
+    }
+    </script>
+
+<!-- List -->
     <div class="container d-flex justify-content-center">
         <div class="home-list">
             <ul class="">
@@ -12,7 +67,7 @@
                         <a href="/trucks/{{ truck.id }}">
                             <img id="home-avatar" src="{{ truck.logo_image }}" alt="">
                         </a>
-                        <div class="">
+                        <div>
                             <h5 id="truck-name-home">
                                 <a href="/trucks/{{ truck.id }}"><strong>{{ truck.name }}</strong></a>
                             </h5>
@@ -31,3 +86,5 @@
     </div>
 
 {% endblock %}
+
+a
